@@ -1,39 +1,130 @@
+
 import 'package:sqflite/sqflite.dart';
 import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 import "package:path/path.dart" show join;
-import "package:flutter/src/services/asset_bundle.dart" show rootBundle;
-import 'package:path_provider/path_provider.dart';
+import "package:flutter/services.dart" show rootBundle;
 
 class Plaats {
-  int id;
-  String naam;
+  final int id;
+  final String naam;
 
-  Plaats({naam: String, id: int}) {
-    this.naam = naam;
-    this.id = id;
-  }
+  Plaats({this.naam, this.id});
+}
+
+class Keuken {
+  final int id;
+  final String naam;
+  final Uint8List icon;
+
+  Keuken({this.id, this.naam, this.icon});
+}
+
+class Restaurant {
+  final int id;
+  final String naam;
+  final int keukenId;
+  final String pitch;
+  final String website;
+  final String telefoonummer;
+  final String adres;
+  final String email;
+  final String postcode;
+  final String bestelLink;
+  final String derdenBestelLink;
+  final bool kanOphalen;
+  final bool kanBezorgen;
+
+  Restaurant(
+      {this.id,
+      this.naam,
+      this.keukenId,
+      this.pitch,
+      this.website,
+      this.telefoonummer,
+      this.adres,
+      this.email,
+      this.postcode,
+      this.bestelLink,
+      this.derdenBestelLink,
+      this.kanOphalen,
+      this.kanBezorgen});
 }
 
 class DatabaseHelper {
   DatabaseHelper._privateConstructor();
   static final DatabaseHelper instance = DatabaseHelper._privateConstructor();
 
+  Future<Keuken> fetchKeuken(int keukenId) async {
+    assert(keukenId != null);
+
+    Database db = await database;
+    var resultatenVanDb = await db.query("keuken", where: "id = $keukenId", limit: 1);
+    //print("Gevonden keukens: ${resultaten_van_db} voor id: $keukenId");
+    var row = resultatenVanDb[0];
+    var id = row["id"];
+    var naam = row["naam"];
+    var iconBlob = row["icon"];
+
+    return Keuken(id: id, naam: naam, icon: iconBlob );
+  }
+
   Future<List<Plaats>> fetchPlaatsen() async {
     Database db = await database;
-    var resultaten_van_db = await db.query("plaats");
+    var resultatenVanDb = await db.query("plaats");
 
     List<Plaats> plaatsen = [];
 
-    resultaten_van_db.forEach((element) {
+    resultatenVanDb.forEach((element) {
       var id = element["id"];
-      var naam  = element["naam"];
-      Plaats plaats = Plaats(id:id, naam: naam);
+      var naam = element["naam"];
+      Plaats plaats = Plaats(id: id, naam: naam);
       plaatsen.add(plaats);
     });
 
     return plaatsen;
+  }
+
+  Future<List<Restaurant>> fetchRestaurants(Plaats plaats) async {
+    Database db = await database;
+    var resultatenVanDb =
+        await db.query("restaurant", where: "plaats_id = ${plaats.id}");
+
+    List<Restaurant> restaurants = [];
+
+    resultatenVanDb.forEach((element) {
+      var id = element["id"];
+      var keukenId = element["keuken_id"];
+      var naam = element["naam"];
+      var pitch = element["pitch"];
+      var website = element["website"];
+      var telefoonnummer = element["telefoonnummer"];
+      var adres = element["adres"];
+      var email = element["email"];
+      var postcode = element["postcode"];
+      var bestelLink = element["bestel_link"];
+      var derdenBestelLink = element["derden_bestel_link"];
+      var kanOphalen = element["kan_ophalen"];
+      var kanBezorgen = element["kan_bezorgen"];
+
+      Restaurant restaurant = Restaurant(id: id,
+          naam: naam,
+          keukenId: keukenId,
+          pitch: pitch,
+          website: website,
+          telefoonummer: telefoonnummer,
+          adres: adres,
+          email: email,
+          postcode: postcode,
+          bestelLink: bestelLink,
+          derdenBestelLink: derdenBestelLink,
+          kanBezorgen: kanBezorgen == 1,
+          kanOphalen: kanOphalen == 1);
+      restaurants.add(restaurant);
+    });
+
+    return restaurants;
   }
 
   static Database _database;
@@ -47,12 +138,11 @@ class DatabaseHelper {
 
   // this opens the database (and creates it if it doesn't exist)
   _initDatabase() async {
-
     var databasesPath = await getDatabasesPath();
     var path = join(databasesPath, "demo_asset_example.db");
 
     // Only copy if the database doesn't exist
-    if (FileSystemEntity.typeSync(path) == FileSystemEntityType.notFound) {
+    //if (FileSystemEntity.typeSync(path) == FileSystemEntityType.notFound) {
       // Load database from asset and copy
       ByteData data = await rootBundle.load(join('db', 'db.sqlite3'));
       List<int> bytes =
@@ -60,7 +150,7 @@ class DatabaseHelper {
 
       // Save copied asset to documents
       await new File(path).writeAsBytes(bytes);
-    }
+    //}
 
     return await openDatabase(path);
   }
