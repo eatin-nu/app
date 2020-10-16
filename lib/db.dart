@@ -6,9 +6,35 @@ import "package:path/path.dart" show join;
 import "package:flutter/src/services/asset_bundle.dart" show rootBundle;
 import 'package:path_provider/path_provider.dart';
 
+class Plaats {
+  int id;
+  String naam;
+
+  Plaats({naam: String, id: int}) {
+    this.naam = naam;
+    this.id = id;
+  }
+}
+
 class DatabaseHelper {
   DatabaseHelper._privateConstructor();
   static final DatabaseHelper instance = DatabaseHelper._privateConstructor();
+
+  Future<List<Plaats>> fetchPlaatsen() async {
+    Database db = await database;
+    var resultaten_van_db = await db.query("plaats");
+
+    List<Plaats> plaatsen = [];
+
+    resultaten_van_db.forEach((element) {
+      var id = element["id"];
+      var naam  = element["naam"];
+      Plaats plaats = Plaats(id:id, naam: naam);
+      plaatsen.add(plaats);
+    });
+
+    return plaatsen;
+  }
 
   static Database _database;
 
