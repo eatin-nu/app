@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'db.dart';
-import 'package:sqflite/sqflite.dart';
-import 'dart:async';
+import 'package:url_launcher/url_launcher.dart';
+import 'dart:core';
 
 void main() {
   runApp(MyApp());
@@ -50,7 +50,6 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-    Future<Database> db = DatabaseHelper.instance.database;
     plaatsen = DatabaseHelper.instance.fetchPlaatsen();
   }
 
@@ -99,21 +98,142 @@ class Zoekpagina extends StatefulWidget {
   final Plaats plaats;
 
   @override
-  Zoekpagina({Key Key, this.plaats}) : super(key: key);
+  Zoekpagina({Key key, this.plaats}) : super(key: key);
 
   // @override
   _ZoekpaginaState createState() => _ZoekpaginaState();
 }
 
 class _ZoekpaginaState extends State<Zoekpagina> {
+  Future<List<Restaurant>> restaurants;
+
+  @override
+  void initState() {
+    super.initState();
+    restaurants = DatabaseHelper.instance.fetchRestaurants(this.widget.plaats);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text("Restaurants in ${widget.plaats.naam}"),
+      appBar: AppBar(
+        title: Text("Restaurants in ${widget.plaats.naam}"),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: FutureBuilder(
+          future: this.restaurants,
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              List<Restaurant> restaurants = snapshot.data;
+
+              var children = restaurants.map((e) {
+                var keuken = DatabaseHelper.instance.fetchKeuken(e.keukenId);
+
+                return FlatButton(
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => RestaurantDetails(
+                              restaurant: e,
+                            ),
+                          ));
+                    },
+                    child: Row(
+                      children: [
+                        FutureBuilder(
+                          future: keuken,
+                          builder: (context, snapshot) {
+                            if (snapshot.hasData) {
+                              Keuken keuken = snapshot.data;
+                              return Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Image.memory(keuken.icon, height: 50),
+                              );
+                            } else if (snapshot.hasError) {
+                              print(snapshot.error);
+                              return Text("${snapshot.error}");
+                            } else {
+                              return Text(".");
+                            }
+                          },
+                        ),
+                        Text("Restaurant ${e.naam}"),
+                      ],
+                    ));
+              }).toList();
+
+              return ListView(children: children);
+            } else {
+              return Text("Bezig met laden...");
+            }
+          },
         ),
-        body: Center(
-          child: Text("De Stad ${widget.plaats.naam}"),
+      ),
+    );
+  }
+}
+
+class RestaurantDetails extends StatefulWidget {
+  final Restaurant restaurant;
+
+  @override
+  RestaurantDetails({Key key, this.restaurant}) : super(key: key);
+
+  @override
+  _RestaurantState createState() => _RestaurantState();
+}
+
+class _RestaurantState extends State<RestaurantDetails> {
+  @override
+  Widget build(BuildContext context) {
+    String adresUrl = "https://maps.google.com/?q=${Uri.encodeComponent(widget.restaurant.adres)}";
+
+
+    return Scaffold(
+        appBar: AppBar(
+          title: Text("${widget.restaurant.naam}"),
+        ),
+        body: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            children: [
+              Text("${widget.restaurant.pitch}"),
+              Text(
+                "Contactgegevens",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              Text("${widget.restaurant.telefoonummer}"),
+              Link(tekst: "${widget.restaurant.website}", url: widget.restaurant.website),
+              Link(tekst: "Bestel hier", url: widget.restaurant.bestelLink),
+              Link(tekst: "Bestel hier via derde partij", url: widget.restaurant.derdenBestelLink),
+              Link(tekst: "Bekijk op kaart", url: adresUrl),
+            ]
+          ),
         ));
+  }
+}
+
+class Link extends StatelessWidget {
+  final String tekst;
+  final String url;
+
+  Link({Key key, this.tekst, this.url}): super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      child: Text(tekst,
+          style: TextStyle(
+            decoration: TextDecoration.underline,
+            color: Colors.blue,
+          )),
+      onTap: () async {
+        if (await canLaunch(url)) {
+          await launch(url);
+        }
+      },
+    );
   }
 }
