@@ -1,4 +1,8 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
+import 'db.dart';
+import 'package:sqflite/sqflite.dart';
+import 'dart:async';
 
 void main() {
   runApp(MyApp());
@@ -52,6 +56,22 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
 
+  Future<String> eerstePlaatsNaam;
+
+  @override
+  void initState() {
+    super.initState();
+    Future<Database> db = DatabaseHelper.instance.database;
+    eerstePlaatsNaam = getEersteNaam(db);
+  }
+
+  Future<String> getEersteNaam(Future<Database> db) async {
+    Database d = await db;
+    var temp = await d.query("plaats");
+    var eersteRegel = temp[0];
+    return eersteRegel["naam"].toString();
+  }
+
   void _incrementCounter() {
     setState(() {
       // This call to setState tells the Flutter framework that something has
@@ -71,6 +91,7 @@ class _MyHomePageState extends State<MyHomePage> {
     // The Flutter framework has been optimized to make rerunning build methods
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
+
     return Scaffold(
       appBar: AppBar(
         // Here we take the value from the MyHomePage object that was created by
@@ -97,6 +118,10 @@ class _MyHomePageState extends State<MyHomePage> {
           // horizontal).
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            FutureBuilder(
+              future: eerstePlaatsNaam,
+              builder: (context, snapshot) => Text('${snapshot.data}'),
+            ),
             Text(
               'You have pushed the button this many times:',
             ),
