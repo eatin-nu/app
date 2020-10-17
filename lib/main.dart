@@ -60,49 +60,53 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
-      ),
+          title: Image(
+        image: AssetImage('assets/Logo.png'),
+        height: 50,
+      )),
       body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: <Widget>[
-              Text(
-                'Kies jouw stad:',
-                style: GoogleFonts.getFont('Varela Round',
-                    fontWeight: FontWeight.w700, fontSize: 30),
-              ),
-              Text(
-                '',
-                style: GoogleFonts.getFont('Varela Round',
-                    fontWeight: FontWeight.w700, fontSize: 36),
-              ),
-              FutureBuilder(
-                future: plaatsen,
-                builder: (context, snapshot) {
-                  List<Plaats> plaatsen = snapshot.data;
-                  return Column(
-                      children: plaatsen.map((plaats) {
-                    return FlatButton(
-                      child: Text("${plaats.naam}",
-                          style: GoogleFonts.getFont('Varela Round',
-                              fontWeight: FontWeight.w700, fontSize: 40)),
-                      onPressed: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => Zoekpagina(
-                                plaats: plaats,
-                              ),
-                            ));
-                      },
-                    );
-                  }).toList());
-                },
-              ),
-            ],
-          ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: <Widget>[
+            Text(
+              '',
+              style: GoogleFonts.getFont('Varela Round',
+                  fontWeight: FontWeight.w700, fontSize: 30),
+            ),
+            Text(
+              'Kies jouw stad:',
+              style: GoogleFonts.getFont('Varela Round',
+                  fontWeight: FontWeight.w700, fontSize: 30),
+            ),
+            Text(
+              '',
+              style: GoogleFonts.getFont('Varela Round',
+                  fontWeight: FontWeight.w700, fontSize: 30),
+            ),
+            FutureBuilder(
+              future: plaatsen,
+              builder: (context, snapshot) {
+                List<Plaats> plaatsen = snapshot.data;
+                return Column(
+                    children: plaatsen.map((plaats) {
+                  return FlatButton(
+                    child: Text("${plaats.naam}",
+                        style: GoogleFonts.getFont('Varela Round',
+                            fontWeight: FontWeight.w700, fontSize: 40)),
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => Zoekpagina(
+                              plaats: plaats,
+                            ),
+                          ));
+                    },
+                  );
+                }).toList());
+              },
+            ),
+          ],
         ),
       ),
     );
@@ -135,7 +139,7 @@ class _ZoekpaginaState extends State<Zoekpagina> {
         title: Text("Restaurants in ${widget.plaats.naam}"),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(20.0),
+        padding: const EdgeInsets.all(10.0),
         child: FutureBuilder(
           future: this.restaurants,
           builder: (context, snapshot) {
@@ -163,8 +167,8 @@ class _ZoekpaginaState extends State<Zoekpagina> {
                             if (snapshot.hasData) {
                               Keuken keuken = snapshot.data;
                               return Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Image.memory(keuken.icon, height: 30),
+                                padding: const EdgeInsets.all(7.0),
+                                child: Image.memory(keuken.icon, height: 18),
                               );
                             } else if (snapshot.hasError) {
                               print(snapshot.error);
@@ -225,44 +229,37 @@ class _RestaurantState extends State<RestaurantDetails> {
                   fontSize: 20,
                   color: Colors.green[700]),
             ),
-            Text(
-              "",
-              style: GoogleFonts.getFont('Varela Round',
-                  fontWeight: FontWeight.w100,
-                  fontSize: 16,
-                  color: Colors.green[700]),
-            ),
+            SizedBox(height: 60),
             Text(
               "Contactgegevens",
               style: GoogleFonts.getFont('Varela Round',
                   fontWeight: FontWeight.w700, fontSize: 20),
             ),
+            SizedBox(height: 20),
             Text(
               "Telefoonummer: " "${widget.restaurant.telefoonummer}",
               style: GoogleFonts.getFont('Varela Round',
                   fontWeight: FontWeight.w400, fontSize: 16),
             ),
+            SizedBox(height: 20),
             Link(
                 tekst: "Website van ${widget.restaurant.naam}",
                 url: widget.restaurant.website),
-            Text(
-              "",
-              style: GoogleFonts.getFont('Varela Round',
-                  fontWeight: FontWeight.w100,
-                  fontSize: 16,
-                  color: Colors.green[700]),
-            ),
+            SizedBox(height: 60),
             Text(
               "Bestellen",
               style: GoogleFonts.getFont('Varela Round',
                   fontWeight: FontWeight.w700, fontSize: 20),
             ),
+            SizedBox(height: 20),
             Link(
                 tekst: "Bestel hier via de website van het restaurant",
                 url: widget.restaurant.bestelLink),
+            SizedBox(height: 20),
             Link(
                 tekst: "Bestel hier via derde partij",
                 url: widget.restaurant.derdenBestelLink),
+            SizedBox(height: 20),
             Link(tekst: "Bekijk op kaart", url: adresUrl),
           ]),
         ));
