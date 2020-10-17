@@ -48,8 +48,6 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   Future<List<Plaats>> plaatsen;
 
-  get fontSize => 48;
-
   @override
   void initState() {
     super.initState();
