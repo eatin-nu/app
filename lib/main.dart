@@ -181,7 +181,7 @@ class _ZoekpaginaState extends State<Zoekpagina> {
                         Text(
                           "${e.naam}",
                           style: GoogleFonts.getFont('Varela Round',
-                              fontWeight: FontWeight.w200, fontSize: 18),
+                              fontWeight: FontWeight.w200, fontSize: 19),
                         ),
                       ],
                     ));
