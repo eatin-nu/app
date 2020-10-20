@@ -57,6 +57,49 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      endDrawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: <Widget>[
+            DrawerHeader(
+              child: Text('EatIn menu'),
+              decoration: BoxDecoration(
+                color: Colors.amber,
+              ),
+            ),
+            ListTile(
+              title: Text('Over ons'),
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => OverOns(),
+                    ));
+              },
+            ),
+            ListTile(
+              title: Text('Aanmelden'),
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => Aanmelden(),
+                    ));
+              },
+            ),
+            ListTile(
+              title: Text('Privacy Statement'),
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => Privacy(),
+                    ));
+                },
+            ),
+          ],
+        ),
+      ),
       appBar: AppBar(
           title: Image(
         image: AssetImage('assets/Logo.png'),
@@ -259,6 +302,85 @@ class _RestaurantState extends State<RestaurantDetails> {
                 url: widget.restaurant.derdenBestelLink),
             SizedBox(height: 20),
             Link(tekst: "Bekijk op kaart", url: adresUrl),
+          ]),
+        ));
+  }
+}
+
+class OverOns extends StatelessWidget {
+  Widget build(BuildContext context) {
+    return Scaffold(
+        appBar: AppBar(
+          title: Text("Over Ons"),
+        ),
+        body: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child:
+              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(
+              "Wij, twee Utrechters, waren op zoek naar overzicht van de restaurants in de stad die afhaal of bezorgen aanbieden."
+              "\n \nAangezien we hiervan geen overzicht hebben kunnen vinden hebben besloten deze app te ontwikkelen en daarmee een lijst te maken."
+              "\n \nWe bieden deze app tegen kostprijs aan, daarom is er reclame aanwezig in de app."
+              "\n \nWe bieden geen dienstverlening in de vorm van bezorgen of de mogelijkheid om de bestellen, die loopt allemaal via de horeca ondernemingen zelf.",
+              style: GoogleFonts.getFont('Varela Round',
+                  fontWeight: FontWeight.w100,
+                  fontSize: 16,
+                  color: Colors.green[700]),
+            ),
+          ]),
+        ));
+  }
+}
+
+class Aanmelden extends StatelessWidget {
+  Widget build(BuildContext context) {
+    return Scaffold(
+        appBar: AppBar(
+          title: Text("Aanmelden"),
+        ),
+        body: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child:
+              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(
+              "Als u gebruik wil maken van de deze optie om uw restaurant ook onder de aandacht te brengen, "
+              "dan willen we u vragen online de informatie van het restaurant aan ons beschikbaar te stellen. "
+              "\n\nDeze informatie zullen wij vervolgens toevoegen aan de app. Als we een aantal restaurants hebben opgenomen in de app, "
+              "zullen we beginnen met de promotie van de app onder consumenten."
+              "\n\nOnze doelstelling is om deze app kostenneutraal aan te bieden aan de gebruikers en aan u als restauranthouder. "
+              "Als er gegevens ontbreken of onjuist zijn in de app dan kunt u via info@eatin.nu contact met ons opnemen.",
+              style: GoogleFonts.getFont('Varela Round',
+                  fontWeight: FontWeight.w100,
+                  fontSize: 16,
+                  color: Colors.green[700]),
+            ),
+          ]),
+        ));
+  }
+}
+
+class Privacy extends StatelessWidget {
+  Widget build(BuildContext context) {
+    return Scaffold(
+        appBar: AppBar(
+          title: Text("Aanmelden"),
+        ),
+        body: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child:
+              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(
+              "Gebruik van onze diensten"
+              "\n\nWanneer jij je aanmeldt om te worden opgenomen in de app, vragen we je om persoonsgegevens te verstrekken."
+              "Deze gegevens worden alleen gebruikt om de informatie in de app correct te houden en worden niet verstrekt aan derde partijen."
+              "\n\nDeze gegevens worden gebruikt om de dienst uit te kunnen voeren. De gegevens worden opgeslagen op servers van een derde partij."
+              "\n\n\nRegistratie gebruik app"
+                  "\n\nWij leggen het gebruik van de app geannonimiseerd vast. Wij verzamelen deze gegevens voor onderzoek om zo inzicht te krijgen in het gebruik van de app.",
+              style: GoogleFonts.getFont('Varela Round',
+                  fontWeight: FontWeight.w100,
+                  fontSize: 16,
+                  color: Colors.green[700]),
+            ),
           ]),
         ));
   }
