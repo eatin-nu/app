@@ -105,12 +105,20 @@ class DatabaseHelper {
   }
 
   // Filter op keukens, als filterKeuken != -1
-  Future<List<Restaurant>> fetchRestaurants({Plaats plaats, int filterKeuken  = -1}) async {
+  Future<List<Restaurant>> fetchRestaurants({Plaats plaats, int filterKeuken  = -1, bool filterOpKanBezorgen = false, bool filterOpKanOphalen = false}) async {
     Database db = await database;
     String extraWhereClause = "";
 
     if (filterKeuken != -1) {
       extraWhereClause = "and keuken_id = ${filterKeuken}" ;
+    }
+
+    if (filterOpKanBezorgen) {
+      extraWhereClause += "and kan_bezorgen = 1" ;
+    }
+
+    if (filterOpKanOphalen) {
+      extraWhereClause += "and kan_ophalen = 1" ;
     }
 
     var resultatenVanDb =

@@ -18,17 +18,27 @@ class Zoekpagina extends StatefulWidget {
 
 class _ZoekpaginaState extends State<Zoekpagina> {
   Future<List<Restaurant>> restaurants;
-  int keukenFilter = -1;
+  int keukenFilter;
+  bool filterOpKanOphalen;
+  bool filterOpKanBezorgen;
+
 
   @override
   void initState() {
     super.initState();
-    restaurants = DatabaseHelper.instance.fetchRestaurants(plaats: this.widget.plaats);
+    keukenFilter = -1;
+    filterOpKanBezorgen = false;
+    filterOpKanOphalen = false;
+    pasFilterToe();
   }
 
-  void pasFilterToe(int filterOp) {
-    keukenFilter = filterOp;
-    restaurants = DatabaseHelper.instance.fetchRestaurants(plaats: this.widget.plaats, filterKeuken: filterOp);
+  void pasFilterToe() {
+    restaurants = DatabaseHelper.instance.fetchRestaurants(
+        plaats: this.widget.plaats,
+        filterKeuken: this.keukenFilter,
+        filterOpKanBezorgen: this.filterOpKanBezorgen,
+        filterOpKanOphalen: this.filterOpKanOphalen,
+    );
   }
 
   @override
@@ -44,32 +54,51 @@ class _ZoekpaginaState extends State<Zoekpagina> {
       body: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         children: <Widget>[
-          DropdownButton<int>(
-            value: keukenFilter,
-            icon: Icon(Icons.arrow_downward),
-            iconSize: 24,
-            elevation: 16,
-            style: TextStyle(color: Colors.deepPurple),
-            underline: Container(
-              height: 2,
-              color: Colors.deepPurpleAccent,
-            ),
-            onChanged: (int newValue) {
-              setState(() {
-                pasFilterToe(newValue);
-              });
-            },
-            items: keukens.map<DropdownMenuItem<int>>((Keuken value) {
-              return DropdownMenuItem<int>(
-                value: value.id,
-                child: Row(children:[
-                  //Image.memory(value.icon, height: 18),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text("${value.naam}"),
-                  ), ]),
-              );
-            }).toList(),
+          Row(
+            children: [
+              DropdownButton<int>(
+                value: keukenFilter,
+                icon: Icon(Icons.arrow_downward),
+                iconSize: 24,
+                elevation: 16,
+                style: TextStyle(color: Colors.deepPurple),
+                underline: Container(
+                  height: 2,
+                  color: Colors.deepPurpleAccent,
+                ),
+                onChanged: (int newValue) {
+                  setState(() {
+                    keukenFilter = newValue;
+                    pasFilterToe();
+                  });
+                },
+                items: keukens.map<DropdownMenuItem<int>>((Keuken value) {
+                  return DropdownMenuItem<int>(
+                    value: value.id,
+                    child: Row(children:[
+                      //Image.memory(value.icon, height: 18),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text("${value.naam}"),
+                      ), ]),
+                  );
+                }).toList(),
+              ),
+              Checkbox(value: this.filterOpKanBezorgen, onChanged: (bool val) {
+                this.setState(() {
+                  this.filterOpKanBezorgen = val;
+                  pasFilterToe();
+                });
+              }),
+              Text("Bezorgen"),
+              Checkbox(value: this.filterOpKanOphalen, onChanged: (bool val) {
+                this.setState(() {
+                  this.filterOpKanOphalen = val;
+                  pasFilterToe();
+                });
+              }),
+              Text("Ophalen")
+            ],
           ),
           Expanded(
             child: FutureBuilder(
