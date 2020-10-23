@@ -110,15 +110,15 @@ class DatabaseHelper {
     String extraWhereClause = "";
 
     if (filterKeuken != -1) {
-      extraWhereClause = "and keuken_id = ${filterKeuken}" ;
+      extraWhereClause += " and keuken_id = ${filterKeuken}" ;
     }
 
     if (filterOpKanBezorgen) {
-      extraWhereClause += "and kan_bezorgen = 1" ;
+      extraWhereClause += " and kan_bezorgen = 1" ;
     }
 
     if (filterOpKanOphalen) {
-      extraWhereClause += "and kan_ophalen = 1" ;
+      extraWhereClause += " and kan_ophalen = 1" ;
     }
 
     var resultatenVanDb =
