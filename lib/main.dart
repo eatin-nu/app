@@ -127,24 +127,34 @@ class _MyHomePageState extends State<MyHomePage> {
             FutureBuilder(
               future: plaatsen,
               builder: (context, snapshot) {
-                List<Plaats> plaatsen = snapshot.data;
-                return Column(
-                    children: plaatsen.map((plaats) {
-                  return FlatButton(
-                    child: Text("${plaats.naam}",
-                        style: GoogleFonts.getFont('Varela Round',
-                            fontWeight: FontWeight.w700, fontSize: 40)),
-                    onPressed: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => Zoekpagina(
-                              plaats: plaats,
-                            ),
-                          ));
-                    },
-                  );
-                }).toList());
+                if (snapshot.hasError) {
+                  return Text("Er is iets mis gegaan, herstart de app");
+                }
+
+                if (snapshot.hasData) {
+                  List<Plaats> plaatsen = snapshot.data;
+                  return Column(
+                      children: plaatsen.map((plaats) {
+                        return FlatButton(
+                          child: Text("${plaats.naam}",
+                              style: GoogleFonts.getFont('Varela Round',
+                                  fontWeight: FontWeight.w700, fontSize: 40)),
+                          onPressed: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      Zoekpagina(
+                                        plaats: plaats,
+                                      ),
+                                ));
+                          },
+                        );
+                      }).toList());
+                }
+
+                // no data, show spinner
+                return Text("Bezig met laden...");
               },
             ),
           ],

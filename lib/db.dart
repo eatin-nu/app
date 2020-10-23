@@ -5,6 +5,7 @@ import 'dart:io';
 import 'dart:typed_data';
 import "package:path/path.dart" show join;
 import "package:flutter/services.dart" show rootBundle;
+import 'package:http/http.dart' as http;
 
 class Plaats {
   final int id;
@@ -141,16 +142,14 @@ class DatabaseHelper {
     var databasesPath = await getDatabasesPath();
     var path = join(databasesPath, "demo_asset_example.db");
 
-    // Only copy if the database doesn't exist
-    //if (FileSystemEntity.typeSync(path) == FileSystemEntityType.notFound) {
-      // Load database from asset and copy
-      ByteData data = await rootBundle.load(join('db', 'db.sqlite3'));
-      List<int> bytes =
-          data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
+    String url = "http://eatin.nu/db/db.sqlite3";
+    var response = await http.get(url);
 
-      // Save copied asset to documents
-      await new File(path).writeAsBytes(bytes);
-    //}
+    if (response.statusCode != 200) {
+      throw Exception("Noooez, we kunnen de db niet downloaden :(");
+    }
+    var bytes = response.bodyBytes;
+    await new File(path).writeAsBytes(bytes);
 
     return await openDatabase(path);
   }
