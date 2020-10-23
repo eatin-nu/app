@@ -70,6 +70,23 @@ class DatabaseHelper {
 
     return Keuken(id: id, naam: naam, icon: iconBlob );
   }
+  Future<Map<int,Keuken>> fetchKeukens() async {
+    Database db = await database;
+    var resultatenVanDb = await db.query("keuken");
+    Map<int, Keuken> keukens = Map();
+
+    resultatenVanDb.forEach((row) {
+      var id = row["id"];
+      var naam = row["naam"];
+      var iconBlob = row["icon"];
+
+      var keuken = Keuken(id: id, naam: naam, icon: iconBlob );
+      keukens[id] = keuken;
+    });
+
+
+    return keukens;
+  }
 
   Future<List<Plaats>> fetchPlaatsen() async {
     Database db = await database;
@@ -87,10 +104,17 @@ class DatabaseHelper {
     return plaatsen;
   }
 
-  Future<List<Restaurant>> fetchRestaurants(Plaats plaats) async {
+  // Filter op keukens, als filterKeuken != -1
+  Future<List<Restaurant>> fetchRestaurants({Plaats plaats, int filterKeuken  = -1}) async {
     Database db = await database;
+    String extraWhereClause = "";
+
+    if (filterKeuken != -1) {
+      extraWhereClause = "and keuken_id = ${filterKeuken}" ;
+    }
+
     var resultatenVanDb =
-        await db.query("restaurant", where: "plaats_id = ${plaats.id}");
+        await db.query("restaurant", where: "plaats_id = ${plaats.id} ${extraWhereClause}");
 
     List<Restaurant> restaurants = [];
 
