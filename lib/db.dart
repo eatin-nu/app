@@ -37,6 +37,8 @@ class Restaurant {
   final String derdenBestelLink;
   final bool kanOphalen;
   final bool kanBezorgen;
+  final int rdX;
+  final int rdY;
 
   Restaurant(
       {this.id,
@@ -51,7 +53,10 @@ class Restaurant {
       this.bestelLink,
       this.derdenBestelLink,
       this.kanOphalen,
-      this.kanBezorgen});
+      this.kanBezorgen,
+      this.rdX,
+      this.rdY
+      });
 }
 
 class DatabaseHelper {
@@ -62,24 +67,24 @@ class DatabaseHelper {
     assert(keukenId != null);
 
     Database db = await database;
-    var resultatenVanDb = await db.query("keuken", where: "id = $keukenId", limit: 1);
-    //print("Gevonden keukens: ${resultaten_van_db} voor id: $keukenId");
+    var resultatenVanDb = await db.query("kitchens", where: "id = $keukenId", limit: 1);
     var row = resultatenVanDb[0];
     var id = row["id"];
-    var naam = row["naam"];
-    var iconBlob = row["icon"];
+    var naam = row["name"];
+    var iconBlob = row["blob_icon"];
 
     return Keuken(id: id, naam: naam, icon: iconBlob );
   }
+
   Future<Map<int,Keuken>> fetchKeukens() async {
     Database db = await database;
-    var resultatenVanDb = await db.query("keuken");
+    var resultatenVanDb = await db.query("kitchens");
     Map<int, Keuken> keukens = Map();
 
     resultatenVanDb.forEach((row) {
       var id = row["id"];
-      var naam = row["naam"];
-      var iconBlob = row["icon"];
+      var naam = row["name"];
+      var iconBlob = row["blob_icon"];
 
       var keuken = Keuken(id: id, naam: naam, icon: iconBlob );
       keukens[id] = keuken;
@@ -91,13 +96,13 @@ class DatabaseHelper {
 
   Future<List<Plaats>> fetchPlaatsen() async {
     Database db = await database;
-    var resultatenVanDb = await db.query("plaats");
+    var resultatenVanDb = await db.query("places");
 
     List<Plaats> plaatsen = [];
 
     resultatenVanDb.forEach((element) {
       var id = element["id"];
-      var naam = element["naam"];
+      var naam = element["name"];
       Plaats plaats = Plaats(id: id, naam: naam);
       plaatsen.add(plaats);
     });
@@ -111,37 +116,38 @@ class DatabaseHelper {
     String extraWhereClause = "";
 
     if (filterKeuken != -1) {
-      extraWhereClause += " and keuken_id = ${filterKeuken}" ;
+      extraWhereClause += " and kitchen_id = ${filterKeuken}" ;
     }
 
     if (filterOpKanBezorgen) {
-      extraWhereClause += " and kan_bezorgen = 1" ;
+      extraWhereClause += " and can_deliver = 1" ;
     }
 
     if (filterOpKanOphalen) {
-      extraWhereClause += " and kan_ophalen = 1" ;
+      extraWhereClause += " and can_pick_up = 1" ;
     }
 
     var resultatenVanDb =
-        await db.query("restaurant", where: "plaats_id = ${plaats.id} ${extraWhereClause}");
+        await db.query("restaurants", where: "place_id = ${plaats.id} ${extraWhereClause}");
 
     List<Restaurant> restaurants = [];
 
     resultatenVanDb.forEach((element) {
       var id = element["id"];
-      var keukenId = element["keuken_id"];
-      var naam = element["naam"];
+      var keukenId = element["kitchen_id"];
+      var naam = element["name"];
       var pitch = element["pitch"];
       var website = element["website"];
-      var telefoonnummer = element["telefoonnummer"];
-      var adres = element["adres"];
+      var telefoonnummer = ""; // TODO element["telefoonnummer"];
+      var adres = element["full_address"];
       var email = element["email"];
       var postcode = element["postcode"];
-      var bestelLink = element["bestel_link"];
-      var derdenBestelLink = element["derden_bestel_link"];
-      var kanOphalen = element["kan_ophalen"];
-      var kanBezorgen = element["kan_bezorgen"];
-
+      var bestelLink = element["order_link"];
+      var derdenBestelLink = element["third_party_order_link"];
+      var kanOphalen = element["can_pick_up"];
+      var kanBezorgen = element["can_deliver"];
+      var rdX = element["rd_x"];
+      var rdY = element["rd_y"];
       Restaurant restaurant = Restaurant(id: id,
           naam: naam,
           keukenId: keukenId,
@@ -154,7 +160,10 @@ class DatabaseHelper {
           bestelLink: bestelLink,
           derdenBestelLink: derdenBestelLink,
           kanBezorgen: kanBezorgen == 1,
-          kanOphalen: kanOphalen == 1);
+          kanOphalen: kanOphalen == 1,
+          rdX: rdX,
+          rdY: rdY,
+      );
       restaurants.add(restaurant);
     });
 
@@ -173,15 +182,23 @@ class DatabaseHelper {
   // this opens the database (and creates it if it doesn't exist)
   _initDatabase() async {
     var databasesPath = await getDatabasesPath();
-    var path = join(databasesPath, "demo_asset_example.db");
+    var path = join(databasesPath, "eatin.db");
 
-    String url = "http://eatin.nu/db/db.sqlite3";
-    var response = await http.get(url);
+    Uint8List bytes;
 
-    if (response.statusCode != 200) {
-      throw Exception("Noooez, we kunnen de db niet downloaden :(");
+    if (kReleaseMode) {
+      String url = "http://eatin.nu/db/db.sqlite3";
+      var response = await http.get(url);
+
+      if (response.statusCode != 200) {
+        throw Exception("Noooez, we kunnen de db niet downloaden :(");
+      }
+      bytes = response.bodyBytes;
+    } else {
+      ByteData data = await rootBundle.load(join('db', 'db.sqlite3'));
+      bytes = data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
     }
-    var bytes = response.bodyBytes;
+
     await new File(path).writeAsBytes(bytes);
 
     return await openDatabase(path);
