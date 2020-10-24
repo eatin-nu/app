@@ -6,16 +6,35 @@ import 'dart:core';
 import 'package:google_fonts/google_fonts.dart';
 import 'zoekpagina.dart';
 
-void main() {
-  runApp(MyApp());
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_analytics/observer.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+
+  runZonedGuarded(() {
+    runApp(MyApp());
+  }, (error, stackTrace) {
+    print('runZonedGuarded: Caught error in my root zone.');
+    FirebaseCrashlytics.instance.recordError(error, stackTrace);
+    throw error;
+  });
 }
 
 class MyApp extends StatelessWidget {
+   static FirebaseAnalytics analytics = FirebaseAnalytics();
+   static FirebaseAnalyticsObserver observer =
+      FirebaseAnalyticsObserver(analytics: analytics);
+
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
+      navigatorObservers: [observer],
       theme: ThemeData(
         // This is the theme of your application.
         //
@@ -33,15 +52,16 @@ class MyApp extends StatelessWidget {
         visualDensity: VisualDensity.adaptivePlatformDensity,
         textTheme: GoogleFonts.varelaRoundTextTheme(Theme.of(context).textTheme)
       ),
-      home: MyHomePage(title: 'EatIn'),
+      home: MyHomePage(title: 'EatIn', observer: observer),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
+  MyHomePage({Key key, this.title, this.observer}) : super(key: key);
 
   final String title;
+  final FirebaseAnalyticsObserver observer;
 
   @override
   _MyHomePageState createState() => _MyHomePageState();
@@ -74,6 +94,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ListTile(
               title: Text('Over ons'),
               onTap: () {
+                this.widget.observer.analytics.logEvent(name: "bekijk_over_ons");
                 Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -84,6 +105,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ListTile(
               title: Text('Aanmelden'),
               onTap: () {
+                this.widget.observer.analytics.logEvent(name: "bekijk_aanmelden");
                 Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -94,6 +116,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ListTile(
               title: Text('Privacy Statement'),
               onTap: () {
+                this.widget.observer.analytics.logEvent(name: "bekijk_privacy_statement");
                 Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -156,6 +179,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                           Zoekpagina(
                                             plaats: plaats,
                                             keukens: keukens,
+                                            observer: this.widget.observer,
                                           ),
                                     ));
                               },

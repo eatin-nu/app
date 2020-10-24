@@ -6,6 +6,7 @@ import 'dart:typed_data';
 import "package:path/path.dart" show join;
 import "package:flutter/services.dart" show rootBundle;
 import 'package:http/http.dart' as http;
+import 'package:flutter/foundation.dart';
 
 class Plaats {
   final int id;

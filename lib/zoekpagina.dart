@@ -4,13 +4,15 @@ import 'db.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'dart:core';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:firebase_analytics/observer.dart';
 
 class Zoekpagina extends StatefulWidget {
   final Plaats plaats;
   final Map<int, Keuken> keukens;
+  final FirebaseAnalyticsObserver observer;
 
   @override
-  Zoekpagina({Key key, this.plaats, this.keukens}) : super(key: key);
+  Zoekpagina({Key key, this.plaats, this.keukens, this.observer}) : super(key: key);
 
   // @override
   _ZoekpaginaState createState() => _ZoekpaginaState();
@@ -67,6 +69,17 @@ class _ZoekpaginaState extends State<Zoekpagina> {
                   color: Colors.deepPurpleAccent,
                 ),
                 onChanged: (int newValue) {
+                  String keukenNaam = "Alle";
+
+                  if (this.keukenFilter != -1) {
+                    keukenNaam = this.widget.keukens[this.keukenFilter].naam;
+                  }
+                  this.widget.observer.analytics.logEvent(name: "kies_keuken",
+                    parameters: <String, dynamic>{
+                      "keuken_naam": keukenNaam,
+                    }
+                  );
+
                   setState(() {
                     keukenFilter = newValue;
                     pasFilterToe();
@@ -111,14 +124,31 @@ class _ZoekpaginaState extends State<Zoekpagina> {
                 if (snapshot.hasData) {
                   List<Restaurant> restaurants = snapshot.data;
 
-                  var children = restaurants.map((e) {
+                  var children = restaurants.map((restaurant) {
                     return FlatButton(
                         onPressed: () {
+
+                          String filterKeukenNaam = "Geen";
+
+                          if (this.keukenFilter != -1) {
+                            filterKeukenNaam = this.widget.keukens[this.keukenFilter].naam;
+                          }
+
+                          this.widget.observer.analytics.logEvent(
+                              name: "bekijk_restaurant",
+                              parameters: <String, dynamic>{
+                                "restaurant_naam": restaurant.naam,
+                                "plaats": this.widget.plaats.naam,
+                                "filter_keuken": filterKeukenNaam,
+                                "filter_bezorgen": this.filterOpKanBezorgen,
+                                "filter_ophalen": this.filterOpKanOphalen,
+                          });
+                          
                           Navigator.push(
                               context,
                               MaterialPageRoute(
                                 builder: (context) => RestaurantDetails(
-                                  restaurant: e,
+                                  restaurant: restaurant,
                                 ),
                               ));
                         },
@@ -126,10 +156,10 @@ class _ZoekpaginaState extends State<Zoekpagina> {
                           children: [
                             Padding(
                               padding: const EdgeInsets.all(7.0),
-                              child: Image.memory(this.widget.keukens[e.keukenId].icon, height: 18),
+                              child: Image.memory(this.widget.keukens[restaurant.keukenId].icon, height: 18),
                             ),
                             Text(
-                              "${e.naam}",
+                              "${restaurant.naam}",
                               style: GoogleFonts.getFont('Varela Round',
                                   fontWeight: FontWeight.w200, fontSize: 19),
                             ),
