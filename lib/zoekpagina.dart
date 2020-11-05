@@ -51,7 +51,7 @@ class _ZoekpaginaState extends State<Zoekpagina> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("Restaurants in ${widget.plaats.naam}"),
+        title: Text("Locaties in ${widget.plaats.naam}"),
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.start,
@@ -63,10 +63,10 @@ class _ZoekpaginaState extends State<Zoekpagina> {
                 icon: Icon(Icons.arrow_downward),
                 iconSize: 24,
                 elevation: 16,
-                style: TextStyle(color: Colors.deepPurple),
+                style: TextStyle(color: Colors.green[700]),
                 underline: Container(
                   height: 2,
-                  color: Colors.deepPurpleAccent,
+                  color: Colors.green[700],
                 ),
                 onChanged: (int newValue) {
                   String keukenNaam = "Alle";
@@ -103,14 +103,14 @@ class _ZoekpaginaState extends State<Zoekpagina> {
                   pasFilterToe();
                 });
               }),
-              Text("Bezorgen"),
+              Text("Bezorgen",style: TextStyle(color: Colors.green[700]), ),
               Checkbox(value: this.filterOpKanOphalen, onChanged: (bool val) {
                 this.setState(() {
                   this.filterOpKanOphalen = val;
                   pasFilterToe();
                 });
               }),
-              Text("Ophalen")
+              Text("Ophalen",style: TextStyle(color: Colors.green[700]), ),
             ],
           ),
           Expanded(

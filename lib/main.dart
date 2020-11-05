@@ -1,10 +1,13 @@
 import 'dart:async';
+import 'dart:ffi';
+import 'package:eatin/kies_locatie/gps_selector.dart';
 import 'package:flutter/material.dart';
 import 'db.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'dart:core';
 import 'package:google_fonts/google_fonts.dart';
 import 'zoekpagina.dart';
+import 'kies_locatie/address_selector.dart';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
@@ -25,8 +28,8 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
-   static FirebaseAnalytics analytics = FirebaseAnalytics();
-   static FirebaseAnalyticsObserver observer =
+  static FirebaseAnalytics analytics = FirebaseAnalytics();
+  static FirebaseAnalyticsObserver observer =
       FirebaseAnalyticsObserver(analytics: analytics);
 
   // This widget is the root of your application.
@@ -36,22 +39,22 @@ class MyApp extends StatelessWidget {
       title: 'Eatin',
       navigatorObservers: [observer],
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
-        primarySwatch: Colors.amber,
-        // This makes the visual density adapt to the platform that you run
-        // the app on. For desktop platforms, the controls will be smaller and
-        // closer together (more dense) than on mobile platforms.
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-        textTheme: GoogleFonts.varelaRoundTextTheme(Theme.of(context).textTheme)
-      ),
+          // This is the theme of your application.
+          //
+          // Try running your application with "flutter run". You'll see the
+          // application has a blue toolbar. Then, without quitting the app, try
+          // changing the primarySwatch below to Colors.green and then invoke
+          // "hot reload" (press "r" in the console where you ran "flutter run",
+          // or simply save your changes to "hot reload" in a Flutter IDE).
+          // Notice that the counter didn't reset back to zero; the application
+          // is not restarted.
+          primarySwatch: Colors.amber,
+          // This makes the visual density adapt to the platform that you run
+          // the app on. For desktop platforms, the controls will be smaller and
+          // closer together (more dense) than on mobile platforms.
+          visualDensity: VisualDensity.adaptivePlatformDensity,
+          textTheme:
+              GoogleFonts.varelaRoundTextTheme(Theme.of(context).textTheme)),
       home: MyHomePage(title: 'EatIn', observer: observer),
     );
   }
@@ -70,6 +73,8 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   Future<List<Plaats>> plaatsen;
   Future<Map<int, Keuken>> keukens;
+
+  SelectedAddress _address = null;
 
   @override
   void initState() {
@@ -94,7 +99,11 @@ class _MyHomePageState extends State<MyHomePage> {
             ListTile(
               title: Text('Over ons'),
               onTap: () {
-                this.widget.observer.analytics.logEvent(name: "bekijk_over_ons");
+                this
+                    .widget
+                    .observer
+                    .analytics
+                    .logEvent(name: "bekijk_over_ons");
                 Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -105,7 +114,11 @@ class _MyHomePageState extends State<MyHomePage> {
             ListTile(
               title: Text('Aanmelden'),
               onTap: () {
-                this.widget.observer.analytics.logEvent(name: "bekijk_aanmelden");
+                this
+                    .widget
+                    .observer
+                    .analytics
+                    .logEvent(name: "bekijk_aanmelden");
                 Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -116,13 +129,17 @@ class _MyHomePageState extends State<MyHomePage> {
             ListTile(
               title: Text('Privacy Statement'),
               onTap: () {
-                this.widget.observer.analytics.logEvent(name: "bekijk_privacy_statement");
+                this
+                    .widget
+                    .observer
+                    .analytics
+                    .logEvent(name: "bekijk_privacy_statement");
                 Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (context) => Privacy(),
                     ));
-                },
+              },
             ),
           ],
         ),
@@ -132,7 +149,50 @@ class _MyHomePageState extends State<MyHomePage> {
         image: AssetImage('assets/Logo.png'),
         height: 50,
       )),
-      body: Center(
+      body:
+      // Center(
+      //   child: Padding(
+      //     padding: const EdgeInsets.all(8.0),
+      //     child: Column(
+      //       children: [
+      //         Text("Hoi,\n\n We hebben je locatie nodig om te zien welke restaurants er in de buurt zijn"),
+      //         Row(
+      //           children: [
+      //             Expanded(
+      //               child: Padding(
+      //                 padding: const EdgeInsets.all(8.0),
+      //                 child: AddressSelector(
+      //                   onAddressSelected: (address) {
+      //                     this.setState(() {
+      //                       this._address = address;
+      //                     });
+      //                   },
+      //                 ),
+      //               ),
+      //             )
+      //           ],
+      //         ),
+      //         ElevatedButton(
+      //           onPressed: this._address == null ? null : () {
+      //             print("Ajeto");
+      //           },
+      //           child: Text("Kies!"),
+      //         ),
+      //         Divider(),
+      //         Text("Of gebruik je GPS locatie"),
+      //         ElevatedButton(onPressed: () {
+      //           Navigator.push(
+      //               context,
+      //               MaterialPageRoute(
+      //                 builder: (context) => GpsSelector(),
+      //               ));
+      //         },
+      //         child: Text("Gebruik mijn locatie"))
+      //       ],
+      //     ),
+      //   ),
+      // ),
+      Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
@@ -193,10 +253,13 @@ class _MyHomePageState extends State<MyHomePage> {
                 );
               },
             ),
+            FlatButton(onPressed: () => {
+
+            }, child: Text("Of deel je GPS locatie"),
+            ),
           ],
         ),
       ),
     );
   }
 }
-
