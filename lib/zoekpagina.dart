@@ -266,7 +266,7 @@ class _RestaurantState extends State<RestaurantDetails> {
         body: Padding(
           padding: const EdgeInsets.all(20.0),
           child:
-              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              ListView(children: [
             Text(
               "${widget.restaurant.pitch}",
               style: GoogleFonts.getFont('Varela Round',
