@@ -7,14 +7,14 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_analytics/observer.dart';
 import 'package:firebase_admob/firebase_admob.dart';
 
-
 class Zoekpagina extends StatefulWidget {
   final Plaats plaats;
   final Map<int, Keuken> keukens;
   final FirebaseAnalyticsObserver observer;
 
   @override
-  Zoekpagina({Key key, this.plaats, this.keukens, this.observer}) : super(key: key);
+  Zoekpagina({Key key, this.plaats, this.keukens, this.observer})
+      : super(key: key);
 
   // @override
   _ZoekpaginaState createState() => _ZoekpaginaState();
@@ -25,7 +25,6 @@ class _ZoekpaginaState extends State<Zoekpagina> {
   int keukenFilter;
   bool filterOpKanOphalen;
   bool filterOpKanBezorgen;
-
 
   @override
   void initState() {
@@ -38,17 +37,17 @@ class _ZoekpaginaState extends State<Zoekpagina> {
 
   void pasFilterToe() {
     restaurants = DatabaseHelper.instance.fetchRestaurants(
-        plaats: this.widget.plaats,
-        filterKeuken: this.keukenFilter,
-        filterOpKanBezorgen: this.filterOpKanBezorgen,
-        filterOpKanOphalen: this.filterOpKanOphalen,
+      plaats: this.widget.plaats,
+      filterKeuken: this.keukenFilter,
+      filterOpKanBezorgen: this.filterOpKanBezorgen,
+      filterOpKanOphalen: this.filterOpKanOphalen,
     );
   }
 
   @override
   Widget build(BuildContext context) {
     List<Keuken> keukens = this.widget.keukens.values.toList();
-    keukens.sort((a,b) => a.naam.compareTo(b.naam));
+    keukens.sort((a, b) => a.naam.compareTo(b.naam));
     keukens.insert(0, Keuken(id: -1, naam: "Alle keukens"));
 
     return Scaffold(
@@ -76,11 +75,11 @@ class _ZoekpaginaState extends State<Zoekpagina> {
                   if (this.keukenFilter != -1) {
                     keukenNaam = this.widget.keukens[this.keukenFilter].naam;
                   }
-                  this.widget.observer.analytics.logEvent(name: "kies_keuken",
-                    parameters: <String, dynamic>{
-                      "keuken_naam": keukenNaam,
-                    }
-                  );
+                  this.widget.observer.analytics.logEvent(
+                      name: "kies_keuken",
+                      parameters: <String, dynamic>{
+                        "keuken_naam": keukenNaam,
+                      });
 
                   setState(() {
                     keukenFilter = newValue;
@@ -90,29 +89,40 @@ class _ZoekpaginaState extends State<Zoekpagina> {
                 items: keukens.map<DropdownMenuItem<int>>((Keuken value) {
                   return DropdownMenuItem<int>(
                     value: value.id,
-                    child: Row(children:[
+                    child: Row(children: [
                       //Image.memory(value.icon, height: 18),
                       Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Text("${value.naam}"),
-                      ), ]),
+                      ),
+                    ]),
                   );
                 }).toList(),
               ),
-              Checkbox(value: this.filterOpKanBezorgen, onChanged: (bool val) {
-                this.setState(() {
-                  this.filterOpKanBezorgen = val;
-                  pasFilterToe();
-                });
-              }),
-              Text("Bezorgen",style: TextStyle(color: Colors.green[700]), ),
-              Checkbox(value: this.filterOpKanOphalen, onChanged: (bool val) {
-                this.setState(() {
-                  this.filterOpKanOphalen = val;
-                  pasFilterToe();
-                });
-              }),
-              Text("Ophalen",style: TextStyle(color: Colors.green[700]), ),
+              Checkbox(
+                  value: this.filterOpKanBezorgen,
+                  onChanged: (bool val) {
+                    this.setState(() {
+                      this.filterOpKanBezorgen = val;
+                      pasFilterToe();
+                    });
+                  }),
+              Text(
+                "Bezorgen",
+                style: TextStyle(color: Colors.green[700]),
+              ),
+              Checkbox(
+                  value: this.filterOpKanOphalen,
+                  onChanged: (bool val) {
+                    this.setState(() {
+                      this.filterOpKanOphalen = val;
+                      pasFilterToe();
+                    });
+                  }),
+              Text(
+                "Ophalen",
+                style: TextStyle(color: Colors.green[700]),
+              ),
             ],
           ),
           Expanded(
@@ -129,11 +139,11 @@ class _ZoekpaginaState extends State<Zoekpagina> {
                   var children = restaurants.map((restaurant) {
                     return FlatButton(
                         onPressed: () {
-
                           String filterKeukenNaam = "Geen";
 
                           if (this.keukenFilter != -1) {
-                            filterKeukenNaam = this.widget.keukens[this.keukenFilter].naam;
+                            filterKeukenNaam =
+                                this.widget.keukens[this.keukenFilter].naam;
                           }
 
                           this.widget.observer.analytics.logEvent(
@@ -144,8 +154,8 @@ class _ZoekpaginaState extends State<Zoekpagina> {
                                 "filter_keuken": filterKeukenNaam,
                                 "filter_bezorgen": this.filterOpKanBezorgen,
                                 "filter_ophalen": this.filterOpKanOphalen,
-                          });
-                          
+                              });
+
                           Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -158,7 +168,9 @@ class _ZoekpaginaState extends State<Zoekpagina> {
                           children: [
                             Padding(
                               padding: const EdgeInsets.all(7.0),
-                              child: Image.memory(this.widget.keukens[restaurant.keukenId].icon, height: 18),
+                              child: Image.memory(
+                                  this.widget.keukens[restaurant.keukenId].icon,
+                                  height: 18),
                             ),
                             Text(
                               "${restaurant.naam}",
@@ -207,7 +219,8 @@ class _RestaurantState extends State<RestaurantDetails> {
       birthday: DateTime.now(),
       childDirected: false,
       designedForFamilies: false,
-      gender: MobileAdGender.male, // or MobileAdGender.female, MobileAdGender.unknown
+      gender: MobileAdGender
+          .male, // or MobileAdGender.female, MobileAdGender.unknown
       testDevices: <String>[], // Android emulators are considered test devices
     );
 
@@ -232,7 +245,7 @@ class _RestaurantState extends State<RestaurantDetails> {
     );
 
     myBanner
-    // typically this happens well before the ad is shown
+      // typically this happens well before the ad is shown
       ..load()
       ..show(
         // Positions the banner ad 60 pixels from the bottom of the screen
@@ -251,13 +264,79 @@ class _RestaurantState extends State<RestaurantDetails> {
     super.dispose();
   }
 
-
   @override
   Widget build(BuildContext context) {
     String adresUrl =
         "https://maps.google.com/?q=${Uri.encodeComponent(widget.restaurant.adres)}";
 
+    List<Widget> children = <Widget>[
+      Text(
+        "${widget.restaurant.pitch}",
+        style: GoogleFonts.getFont('Varela Round',
+            fontWeight: FontWeight.w100,
+            fontSize: 20,
+            color: Colors.green[700]),
+      ),
+      SizedBox(height: 60),
+      Text(
+        "Contactgegevens",
+        style: GoogleFonts.getFont('Varela Round',
+            fontWeight: FontWeight.w700, fontSize: 20),
+      ),
+      SizedBox(height: 20),
+    ];
 
+    if (widget.restaurant.telefoonnummer != null &&
+        widget.restaurant.telefoonnummer != "") {
+      children.addAll([
+        Link(
+          tekst: widget.restaurant.telefoonnummer,
+          url: "tel://" + widget.restaurant.telefoonnummer,
+        ),
+        SizedBox(height: 20)
+      ]);
+    }
+
+    if (widget.restaurant.website != null && widget.restaurant.website != "") {
+      children.addAll([
+        Link(tekst: widget.restaurant.website, url: widget.restaurant.website),
+        SizedBox(height: 20)
+      ]);
+    }
+
+    children.addAll(<Widget>[
+      SizedBox(height: 60),
+      Text(
+        "Bestellen",
+        style: GoogleFonts.getFont('Varela Round',
+            fontWeight: FontWeight.w700, fontSize: 20),
+      ),
+    ]);
+
+    if (widget.restaurant.bestelLink != null &&
+        widget.restaurant.bestelLink != "") {
+      children.addAll(<Widget>[
+        SizedBox(height: 20),
+        Link(
+            tekst: "Bestel hier via de website van het restaurant",
+            url: widget.restaurant.bestelLink),
+      ]);
+    }
+
+    if (widget.restaurant.derdenBestelLink != null &&
+        widget.restaurant.derdenBestelLink != "") {
+      children.addAll(<Widget>[
+        SizedBox(height: 20),
+        Link(
+            tekst: "Bestel hier via derde partij",
+            url: widget.restaurant.derdenBestelLink),
+      ]);
+    }
+
+    children.addAll(<Widget>[
+      SizedBox(height: 20),
+      Link(tekst: "Bekijk op kaart", url: adresUrl),
+    ]);
 
     return Scaffold(
         appBar: AppBar(
@@ -265,48 +344,7 @@ class _RestaurantState extends State<RestaurantDetails> {
         ),
         body: Padding(
           padding: const EdgeInsets.all(20.0),
-          child:
-              ListView(children: [
-            Text(
-              "${widget.restaurant.pitch}",
-              style: GoogleFonts.getFont('Varela Round',
-                  fontWeight: FontWeight.w100,
-                  fontSize: 20,
-                  color: Colors.green[700]),
-            ),
-            SizedBox(height: 60),
-            Text(
-              "Contactgegevens",
-              style: GoogleFonts.getFont('Varela Round',
-                  fontWeight: FontWeight.w700, fontSize: 20),
-            ),
-            SizedBox(height: 20),
-            Text(
-              "Telefoonummer: " "${widget.restaurant.telefoonummer}",
-              style: GoogleFonts.getFont('Varela Round',
-                  fontWeight: FontWeight.w400, fontSize: 16),
-            ),
-            SizedBox(height: 20),
-            Link(
-                tekst: "Website van ${widget.restaurant.naam}",
-                url: widget.restaurant.website),
-            SizedBox(height: 60),
-            Text(
-              "Bestellen",
-              style: GoogleFonts.getFont('Varela Round',
-                  fontWeight: FontWeight.w700, fontSize: 20),
-            ),
-            SizedBox(height: 20),
-            Link(
-                tekst: "Bestel hier via de website van het restaurant",
-                url: widget.restaurant.bestelLink),
-            SizedBox(height: 20),
-            Link(
-                tekst: "Bestel hier via derde partij",
-                url: widget.restaurant.derdenBestelLink),
-            SizedBox(height: 20),
-            Link(tekst: "Bekijk op kaart", url: adresUrl),
-          ]),
+          child: ListView(children: children),
         ));
   }
 }
@@ -379,7 +417,7 @@ class Privacy extends StatelessWidget {
               "Deze gegevens worden alleen gebruikt om de informatie in de app correct te houden en worden niet verstrekt aan derde partijen."
               "\n\nDeze gegevens worden gebruikt om de dienst uit te kunnen voeren. De gegevens worden opgeslagen op servers van een derde partij."
               "\n\n\nRegistratie gebruik app"
-                  "\n\nWij leggen het gebruik van de app geannonimiseerd vast. Wij verzamelen deze gegevens voor onderzoek om zo inzicht te krijgen in het gebruik van de app.",
+              "\n\nWij leggen het gebruik van de app geannonimiseerd vast. Wij verzamelen deze gegevens voor onderzoek om zo inzicht te krijgen in het gebruik van de app.",
               style: GoogleFonts.getFont('Varela Round',
                   fontWeight: FontWeight.w100,
                   fontSize: 16,

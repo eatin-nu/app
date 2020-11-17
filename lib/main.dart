@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:ffi';
 import 'package:eatin/kies_locatie/gps_selector.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'db.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'dart:core';
@@ -221,6 +222,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     if (snapshot.hasError || keukens_snapshot.hasError) {
                       print("snapshot error: ${snapshot.error}");
                       print("keukens error: ${keukens_snapshot.error}");
+                      //FirebaseCrashlytics.instance.recordError(Exception(m"Failed to show kitchens ${snapshot.error.toString()}"), stack: StackTrace.current);
                       return Text("Er is iets mis gegaan, herstart de app");
                     }
 

@@ -29,7 +29,7 @@ class Restaurant {
   final int keukenId;
   final String pitch;
   final String website;
-  final String telefoonummer;
+  final String telefoonnummer;
   final String adres;
   final String email;
   final String postcode;
@@ -46,7 +46,7 @@ class Restaurant {
       this.keukenId,
       this.pitch,
       this.website,
-      this.telefoonummer,
+      this.telefoonnummer,
       this.adres,
       this.email,
       this.postcode,
@@ -138,7 +138,7 @@ class DatabaseHelper {
       var naam = element["name"];
       var pitch = element["pitch"];
       var website = element["website"];
-      var telefoonnummer = ""; // TODO element["telefoonnummer"];
+      var telefoonnummer = element["telephone_number"];
       var adres = element["full_address"];
       var email = element["email"];
       var postcode = element["postcode"];
@@ -153,7 +153,7 @@ class DatabaseHelper {
           keukenId: keukenId,
           pitch: pitch,
           website: website,
-          telefoonummer: telefoonnummer,
+          telefoonnummer: telefoonnummer,
           adres: adres,
           email: email,
           postcode: postcode,
