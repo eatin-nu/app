@@ -5,6 +5,8 @@ import 'package:url_launcher/url_launcher.dart';
 import 'dart:core';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_analytics/observer.dart';
+import 'package:firebase_admob/firebase_admob.dart';
+
 
 class Zoekpagina extends StatefulWidget {
   final Plaats plaats;
@@ -195,10 +197,67 @@ class RestaurantDetails extends StatefulWidget {
 }
 
 class _RestaurantState extends State<RestaurantDetails> {
+  BannerAd myBanner;
+
+  @override
+  void initState() {
+    MobileAdTargetingInfo targetingInfo = MobileAdTargetingInfo(
+      keywords: <String>['flutterio', 'beautiful apps'],
+      contentUrl: 'https://flutter.io',
+      birthday: DateTime.now(),
+      childDirected: false,
+      designedForFamilies: false,
+      gender: MobileAdGender.male, // or MobileAdGender.female, MobileAdGender.unknown
+      testDevices: <String>[], // Android emulators are considered test devices
+    );
+
+    myBanner = BannerAd(
+      // Replace the testAdUnitId with an ad unit id from the AdMob dash.
+      // https://developers.google.com/admob/android/test-ads
+      // https://developers.google.com/admob/ios/test-ads
+
+      // tweede
+      //adUnitId: "ca-app-pub-8551541803046868/6877606257",
+
+      // eerste
+      adUnitId: "ca-app-pub-8551541803046868/6326060035",
+
+      //oefen
+      //adUnitId: "ca-app-pub-3940256099942544/6300978111",
+      size: AdSize.smartBanner,
+      //targetingInfo: targetingInfo,
+      listener: (MobileAdEvent event) {
+        print("BannerAd event is $event");
+      },
+    );
+
+    myBanner
+    // typically this happens well before the ad is shown
+      ..load()
+      ..show(
+        // Positions the banner ad 60 pixels from the bottom of the screen
+        //anchorOffset: 60.0,
+        // Positions the banner ad 10 pixels from the center of the screen to the right
+        //horizontalCenterOffset: 10.0,
+
+        // Banner Position
+        anchorType: AnchorType.bottom,
+      );
+  }
+
+  @override
+  void dispose() {
+    myBanner?.dispose();
+    super.dispose();
+  }
+
+
   @override
   Widget build(BuildContext context) {
     String adresUrl =
         "https://maps.google.com/?q=${Uri.encodeComponent(widget.restaurant.adres)}";
+
+
 
     return Scaffold(
         appBar: AppBar(
