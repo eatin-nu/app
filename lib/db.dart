@@ -187,7 +187,7 @@ class DatabaseHelper {
     Uint8List bytes;
 
     if (kReleaseMode) {
-      String url = "http://eatin.nu/db/db.sqlite3";
+      String url = "http://db.eatin.nu/db.sqlite3";
       var response = await http.get(url);
 
       if (response.statusCode != 200) {
